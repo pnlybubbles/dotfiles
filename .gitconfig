@@ -3,7 +3,7 @@
 
 [user]
   email = pnlybubbles@gmail.com
-  name = pnlybubbles
+  name = pnly
 
 [push]
   default = simple
@@ -23,22 +23,26 @@
   rao = remote add origin
   rem = remote -v
   f = fetch
+  fmas = "!git fetch . origin/$(git default-branch):$(git default-branch)"
   re = rebase
+  remas = "!git rebase origin/$(git default-branch)"
   rea = rebase --abort
   rec = rebase --continue
-  rebase-to = "!$SHELL -c 'git rebase --interactive $(fcs)'"
+  rebase-to = "!$SHELL -c 'git rebase --interactive $(flog_master)^'"
+  rebase-branch = "!$SHELL -c 'git rebase $(fbranch_raw)'"
+  revert-it = "!$SHELL -c 'git revert $(flog_master)'"
   pk = cherry-pick
   pka = cherry-pick --abort
   pkc = cherry-pick --continue
-  cherry-pick-one = "!$SHELL -c 'git cherry-pick $(fcsa)'"
+  cherry-pick-one = "!$SHELL -c 'git cherry-pick $(flog_master $(fbranch))'"
   cherry-pick-range = "!$SHELL -c 'git cherry-pick $(fcsa)^..$(fcsa)'"
   cherry-picking-hash = "!git status | grep -oP \"(?<=commit\\s)[0-9a-f]+\""
+  merge-it = "!$SHELL -c 'git merge --no-ff $(fbranch)'"
   m = merge --no-ff
-  mmas = merge origin/master
   mff = merge --ff
   aa = add --all
   ap = add -p
-  a = "!$SHELL -c 'git status -su | fzf-tmux --ansi --no-sort --tiebreak=index -d 10 | sed -e \"s/^...//\" | xargs -I % $SHELL -c \"git add %\"'"
+  a = "!$SHELL -c 'git add $(funstaged)'"
   cm = commit
   wip = commit -m 'wip'
   cm-empty = commit --allow-empty --allow-empty-message -m ''
@@ -52,21 +56,24 @@
   poc = !git push -u origin $(git current-branch)
   pc = !git push -u $(git remote | fzf) $(git current-branch)
   ph = push heroku
-  l = log
-  lm = log --author=pnlybubbles
+  l = "!$SHELL -c 'git show -p --color=always --pretty=fuller --stat $(flog $@)'"
+  lm = "!$SHELL -c 'git show -p --color=always --pretty=fuller --stat $(flog --author=pnly)'"
+  lmas = "!$SHELL -c 'git show -p --color=always --pretty=fuller --stat $(flog_master)'"
   lp = log -p
   lf = log --pretty=fuller
   tr = log --all --graph --pretty='format:%C(yellow)%h%Creset%C(red)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  find-merge-commit = "!f() { git log --oneline --ancestry-path --merges $1..$(git default-branch) | tail -n 1 | awk '{ print $1 }'; }; f"
+  find-merge-request = "!f() { git find-merge-commit $1 | xargs -I {} git show {} | grep -oP '(?<=See merge request )(.+\\/.+!\\d+)'; }; f"
   d = diff
-  df = "!$SHELL -c 'git status -su | fzf-tmux --ansi --no-sort --tiebreak=index -d 10 | sed -e \"s/^...//\" | xargs -I % $SHELL -c \"git diff @ %\"'"
+  df = "!$SHELL -c 'git diff --color=always $(funstaged)'"
   diff-with = "!$SHELL -c 'git diff $(fcsa)'"
   diff-between = "!$SHELL -c 'git diff $(fcsa)..$(fcsa)'"
   dp = diff HEAD~1
   dn = diff --name-only
   dd = diff develop
   ddn = diff develop --name-only
-  dmas = diff master
-  dmasn = diff master --name-only
+  dmas = "!git diff origin/$(git default-branch) --color=always"
+  dmasn = "!git diff $(git default-branch) --name-only"
   dc = diff --cached
   dcn = diff --cached --name-only
   ds = diff HEAD..stash@{0}
@@ -85,21 +92,24 @@
   bm = branch -m
   bd = branch -d
   bf = branch -f
-  c = "!$SHELL -c 'git branch -avv | fzf-tmux --ansi --no-sort --tiebreak=index -d 10 | sed -e \"s/..\\(remotes\\/origin\\/\\)\\?\\([^ ]\\+\\).*/\\2/\" | sort | uniq | xargs -I % $SHELL -c \"git checkout %\"'"
-  cf = "!$SHELL -c 'git status -su | fzf-tmux --ansi --no-sort --tiebreak=index -d 10 | sed -e \"s/^...//\" | xargs -I % $SHELL -c \"git checkout @ %\"'"
+  set-upstream-current = !git branch -u origin/$(git current-branch)
+  c = "!$SHELL -c 'git checkout $(fbranch)'"
+  cf = "!$SHELL -c 'git checkout @ $(fstatus)'"
+  cf-prev = "!$SHELL -c 'git checkout @^ $(fdiff @^)'"
   cc = checkout -
-  cd = checkout develop
-  cs = checkout stash@{0}
-  cmas = checkout master
+  cd = checkout develop cs = checkout stash@{0}
+  cmas = "!git checkout $(git default-branch)"
   cb = checkout -b
+  cn = "!f() { git checkout -b $1 origin/$(git default-branch) --no-track; }; f"
   cp = checkout -p
-  checkout-to = "!$SHELL -c 'git checkout $(fcsa)'"
+  checkout-to = "!$SHELL -c 'git checkout $(flog_master $(fbranch))'"
+  res = "!$SHELL -c 'git restore --source $(flog $@) $(fpath)'"
   diff3-conflict = checkout --conflict=diff3
-  unstage = "!$SHELL -c 'git status -su | fzf-tmux --ansi --no-sort --tiebreak=index -d 10 | sed -e \"s/^...//\" | xargs -I % $SHELL -c \"git reset -- %\"'"
+  unstage = "!$SHELL -c 'git reset -- $(fstaged)'"
   unstage-newfile = rm --cached
   unstage-all = reset HEAD
   unstage-all-init = rm --cached -r .
-  us = reset --
+  us = unstage
   usa = unstage-all
   reset-tree = checkout .
   dis = checkout .
@@ -113,9 +123,12 @@
   cancel-merge = reset --merge
   cancel-merge-commit = reset --hard origin
   restore-to-ref = reset --hard
-  reset-to = "!$SHELL -c 'git reset --hard $(fcs)'"
-  delete-untraced-list = clean -f -n
-  delete-untraced = clean -f -d
+  reset-to = "!$SHELL -c 'git reset --hard $(flog_master $(fbranch))'"
+  reset-to-master = "!git reset --hard $(git merge-base $(default-branch) HEAD)"
+  clean-untraced-dry = clean -dn
+  clean-untraced = clean -df
+  clean-all-dry = clean -dxn -e /.vscode
+  clean-all = clean -dxf -e /.vscode
   st = stash
   stu = stash save -u
   stp = stash -p
@@ -129,9 +142,13 @@
   merge-feat = "!f() { if [ $(git current-branch) = 'pu' ]; then git reset --hard master; for b in $(git branch --sort=committerdate | grep -oe \"feat/[^ ]\\+\"); do git merge --no-ff --no-edit $b; done; else echo 'merge-feat is not allowed except for branch: \"pu\".'; fi }; f"
   push-feat = "!git push -f origin $(git branch --sort=committerdate | grep -oe \"feat/[^ ]\\+\")"
   push-gomi = "!f () { hub create pnlybubbles-gomibako/$(basename `pwd`); git push -u origin master; }; f"
+  default-branch = "!git remote show origin | grep 'HEAD branch' | awk '{print $NF}'"
 
 [filter "lfs"]
   process = git-lfs filter-process
   required = true
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
+
+[rerere]
+  enabled = true

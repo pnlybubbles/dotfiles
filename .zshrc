@@ -47,6 +47,20 @@ autoload -Uz url-quote-magic
 autoload -Uz vcs_info
 zle -N self-insert url-quote-magic
 
+# pyenv setup
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
+# direnv settup
+eval "$(direnv hook zsh)"
+
+# nodenv setup
+eval "$(nodenv init -)"
+
+# rustup setup
+. "$HOME/.cargo/env"
+
 ## env
 
 export XDG_CONFIG_HOME=$HOME/.config
@@ -58,23 +72,17 @@ export HISTFILE=~/.zhistory
 export HISTSIZE=1000
 export SAVEHIST=1000000
 export TZ=JST-9
-export PYENV_ROOT="$HOME/.pyenv"
 export PKG_CONFIG_PATH='/usr/local/Cellar/imagemagick@6/6.9.10-14/lib/pkgconfig'
+export LANG='ja_JP.UTF-8'
+export LC_CTYPE='ja_JP.UTF-8'
 
 ## Path
 
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
-export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
-
-## Keybind
-
-# bindkey -v
-# bindkey -v '^?' backward-delete-char
-bindkey '^[[Z' reverse-menu-complete
-bindkey '^r' anyframe-widget-put-history
+export PATH="$HOME/.composer/vendor/bin:$PATH"
 
 ## Alias
 
@@ -90,7 +98,8 @@ alias ....="cd ../../.."
 alias cc="cd +"
 alias grep="grep --color"
 alias vim="nvim"
-alias e="vim"
+alias e="nvim"
+alias notify="echo -e '\a'"
 
 ## Module
 
@@ -126,26 +135,28 @@ _vcs_precmd () {
   fi
 }
 add-zsh-hook precmd _vcs_precmd
-PROMPT='%F{197}❯ %f'
+PROMPT='%B%m%b %F{197}❯ %f'
 RPROMPT=' %F{239}${git_status} ${LEFT_LINE_TRIANGLE} %c%f'
-
-## Rename tmux tab
-
-rename_tmux_window() {
-  if [ $TERM = "screen-256color" ]; then
-    local current_path=`pwd | sed -e s/\ /_/g`
-    local current_dir=`basename $current_path`
-    tmux rename-window $current_dir
-  fi
-}
-add-zsh-hook precmd rename_tmux_window
 
 # Misc
 
-eval "$(direnv hook zsh)"
-eval "$(nodenv init -)"
-eval "$(pyenv init -)"
-# eval "$(rbenv init -)"
+# https://unix.stackexchange.com/questions/75681/why-do-i-have-to-re-set-env-vars-in-tmux-when-i-re-attach
+# Predictable SSH authentication socket location.
+SOCK="/tmp/ssh-agent-$USER-screen"
+if test $SSH_AUTH_SOCK && [ $SSH_AUTH_SOCK != $SOCK ]
+then
+  rm -f /tmp/ssh-agent-$USER-screen
+  ln -sf $SSH_AUTH_SOCK $SOCK
+  export SSH_AUTH_SOCK=$SOCK
+fi
+
+## Keybind
+
+# bindkey -v
+# bindkey -v '^?' backward-delete-char
+bindkey -e
+bindkey '^[[Z' reverse-menu-complete
+bindkey '^r' anyframe-widget-put-history
 
 # Profiling
 
@@ -153,9 +164,3 @@ eval "$(pyenv init -)"
 #   zprof | less
 # fi
 
-
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/pnly/.bin/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/pnly/.bin/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/pnly/.bin/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/pnly/.bin/google-cloud-sdk/completion.zsh.inc'; fi
