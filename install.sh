@@ -39,6 +39,8 @@ echo "done"
 echo "packages..."
 # neovim
 brew install nvim nodenv
+# gnu
+brew install grep gnu-sed
 # fira-code font
 brew tap homebrew/cask-fonts
 brew install --cask font-fira-code
