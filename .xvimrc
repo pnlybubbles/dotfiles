@@ -1,0 +1,3 @@
+inoremap <c-a> <c-o>$
+inoremap <c-a> <c-o>^
+noremap <c-j> <esc>
