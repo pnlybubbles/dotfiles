@@ -7,7 +7,7 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 #eval "$(pyenv init -)"
 
 # direnv settup
-#eval "$(direnv hook zsh)"
+eval "$(direnv hook zsh)"
 
 # nodenv setup
 eval "$(nodenv init -)"
