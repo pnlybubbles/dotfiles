@@ -32,7 +32,7 @@ provision_brew() {
 
 provision_packages() {
   # essentials
-  brew install nvim nodenv direnv grep gnu-sed
+  brew install nvim nodenv direnv grep gnu-sed gh
   # fira-code font
   brew tap homebrew/cask-fonts
   brew install --cask font-fira-code
