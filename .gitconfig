@@ -1,5 +1,6 @@
 [core]
   excludesfile = ~/.gitignore_global
+  ignorecase = false
 
 [user]
   email = pnlybubbles@gmail.com
