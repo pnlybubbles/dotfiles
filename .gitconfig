@@ -93,6 +93,7 @@
   bm = branch -m
   bd = branch -d
   bf = branch -f
+  move-branch-here = "!f() { git branch -f $@ @; git checkout $@; }; f'"
   set-upstream-current = !git branch -u origin/$(git current-branch)
   c = "!$SHELL -c 'git checkout $(fbranch)'"
   cf = "!$SHELL -c 'git checkout @ $(fstatus)'"
