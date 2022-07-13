@@ -96,6 +96,7 @@
   move-branch-here = "!f() { git branch -f $@ @; git checkout $@; }; f'"
   set-upstream-current = !git branch -u origin/$(git current-branch)
   c = "!$SHELL -c 'git checkout $(fbranch)'"
+  c-pr = "!f() { gh pr checkout $@ }; f"
   cf = "!$SHELL -c 'git checkout @ $(fstatus)'"
   cf-prev = "!$SHELL -c 'git checkout @^ $(fdiff @^)'"
   cc = checkout -
@@ -126,7 +127,7 @@
   cancel-merge-commit = reset --hard origin
   restore-to-ref = reset --hard
   reset-to = "!$SHELL -c 'git reset --hard $(flog_master $(fbranch))'"
-  reset-to-master = "!git reset --hard $(git merge-base $(default-branch) HEAD)"
+  reset-to-master = "!git reset --hard $(git merge-base $(git default-branch) HEAD)"
   clean-untraced-dry = clean -dn
   clean-untraced = clean -df
   clean-all-dry = clean -dxn -e /.vscode

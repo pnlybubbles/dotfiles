@@ -1,2 +1,4 @@
 inoremap <c-e> <c-o>$
 inoremap <c-a> <c-o>^
+nnoremap <c-h> :xcmenucmd Show Previous Tab<cr>
+nnoremap <c-l> :xcmenucmd Show Next Tab<cr>
