@@ -6,7 +6,8 @@ provision_links() {
 }
 
 provision_ssh() {
-  ssh-keygen -t ed25519 -C "mba-m1-2020"
+  read -p "ssh comment (mba-m1-2020) > " comment
+  ssh-keygen -t ed25519 -C $comment
   pbcopy < ~/.ssh/id_ed25519.pub
   echo "Public key is stored in clipboard"
   echo "https://github.com/settings/ssh/new"
@@ -32,7 +33,7 @@ provision_brew() {
 
 provision_packages() {
   # essentials
-  brew install nvim nodenv direnv grep gnu-sed gh
+  brew install nvim nodenv direnv grep gnu-sed gh fzf
   # fira-code font
   brew tap homebrew/cask-fonts
   brew install --cask font-fira-code
